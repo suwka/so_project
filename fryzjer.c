@@ -7,7 +7,7 @@
 #define MAX_FRYZJEROW 5
 #define MAX_FOTELI 3
 
-int semafor_fotele; // Semafor do zarzadzania fotelami
+int semafor_fotele;
 
 void* fryzjer(void* id) {
     int fryzjer_id = *(int*)id;
@@ -15,16 +15,11 @@ void* fryzjer(void* id) {
 
     while (1) {
         printf("Fryzjer %d czeka na wolny fotel...\n", fryzjer_id);
-
-        // Sprawdzenie dostępności fotela
-        semafor_p(semafor_fotele, 0);
-
+        semafor_p(semafor_fotele, 0);// Sprawdzenie dostępności fotela
         printf("Fryzjer %d zajmuje fotel i rozpoczyna pracę.\n", fryzjer_id);
         sleep(rand() % 3 + 1); // Symulacja strzyżenia
-
         printf("Fryzjer %d zwalnia fotel.\n", fryzjer_id);
         semafor_v(semafor_fotele, 0);
-
         sleep(rand() % 2 + 1); // Czas na odpoczynek fryzjera
     }
     return NULL;
@@ -33,7 +28,6 @@ void* fryzjer(void* id) {
 int main() {
     srand(time(NULL));
 
-    // Tworzenie semafora dla foteli
     key_t klucz_fotele = ftok("./", 'F');
     semafor_fotele = utworz_semafor(klucz_fotele, 1);
     inicjalizuj_semafor(semafor_fotele, 0, MAX_FOTELI);
@@ -57,7 +51,6 @@ int main() {
         pthread_join(fryzjerzy[i], NULL);
     }
 
-    // Usuwanie semafora
     usun_semafor(semafor_fotele);
 
     return 0;

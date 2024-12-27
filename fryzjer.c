@@ -1,48 +1,79 @@
-int semafor_fotele; // Semafor reprezentujący dostępność foteli.
+#include "funkcje.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <pthread.h>
 
-void* fryzjer(void* id) {
-    int fryzjer_id = *(int*)id; // Pobranie identyfikatora fryzjera.
-    free(id); // Zwolnienie pamięci przydzielonej dla ID.
+#define MAX_FOTELE 5 // Liczba foteli w salonie
+#define MAX_POCZEKALNIA 10 // Liczba miejsc w poczekalni
+
+int semafor_poczekalnia; // Semafor do zarzadzania poczekalnia
+int semafor_fotele;     // Semafor do zarzadzania fotelami
+
+void* fryzjer(void* arg) {
+    int fryzjer_id = *(int*)arg;
+    free(arg);
 
     while (1) {
-        printf("Fryzjer %d czeka na wolny fotel...\n", fryzjer_id);
-        semafor_p(semafor_fotele, 0); // Zmniejszenie wartości semafora (sprawdzenie dostępności fotela).
-        printf("Fryzjer %d zajmuje fotel i rozpoczyna pracę.\n", fryzjer_id);
-        sleep(rand() % 3 + 1); // Symulacja czasu strzyżenia.
-        printf("Fryzjer %d zwalnia fotel.\n", fryzjer_id);
-        semafor_v(semafor_fotele, 0); // Zwiększenie wartości semafora (zwolnienie fotela).
-        sleep(rand() % 2 + 1); // Symulacja czasu przerwy fryzjera.
+        printf("Fryzjer %d czeka na klienta.\n", fryzjer_id);
+
+        // Sprawdza, czy jest klient w poczekalni
+        semafor_p(semafor_poczekalnia, 0);
+
+        printf("Fryzjer %d znalazl klienta i sadza go na fotelu.\n", fryzjer_id);
+
+        // Zajmuje fotel
+        semafor_p(semafor_fotele, 0);
+
+        // Symulacja strzyzenia
+        printf("Fryzjer %d strzyze klienta.\n", fryzjer_id);
+        sleep(rand() % 3 + 1);
+
+        printf("Fryzjer %d skonczyl strzyzenie klienta i zwalnia fotel.\n", fryzjer_id);
+
+        // Zwolnienie fotela
+        semafor_v(semafor_fotele, 0);
     }
+
     return NULL;
 }
 
 int main() {
-    srand(time(NULL)); // Inicjalizacja generatora liczb pseudolosowych.
+    srand(time(NULL));
 
-    key_t klucz_fotele = ftok("./", 'F'); // Tworzenie klucza do identyfikacji semafora.
-    semafor_fotele = utworz_semafor(klucz_fotele, 1); // Tworzenie semafora dla foteli.
-    inicjalizuj_semafor(semafor_fotele, 0, MAX_FOTELI); // Inicjalizacja semafora wartością równą liczbie foteli.
+    // Tworzenie semaforow dla poczekalni i foteli
+    key_t klucz_poczekalnia = ftok("./", 'P');
+    key_t klucz_fotele = ftok("./", 'F');
 
-    pthread_t fryzjerzy[MAX_FRYZJEROW]; // Tablica identyfikatorów wątków fryzjerów.
+    semafor_poczekalnia = utworz_semafor(klucz_poczekalnia, 1);
+    semafor_fotele = utworz_semafor(klucz_fotele, 1);
 
-    for (int i = 0; i < MAX_FRYZJEROW; i++) {
-        int* id = malloc(sizeof(int)); // Dynamiczna alokacja pamięci dla identyfikatora fryzjera.
-        if (id == NULL) { // Sprawdzenie, czy alokacja pamięci się powiodła.
+    inicjalizuj_semafor(semafor_poczekalnia, 0, MAX_POCZEKALNIA); // Ustawienie miejsc w poczekalni
+    inicjalizuj_semafor(semafor_fotele, 0, MAX_FOTELE);
+
+    pthread_t fryzjerzy[3];
+
+    for (int i = 0; i < 3; i++) {
+        int* id = malloc(sizeof(int));
+        if (id == NULL) {
             perror("Błąd alokacji pamięci dla ID fryzjera");
             exit(EXIT_FAILURE);
         }
-        *id = i + 1; // Przypisanie identyfikatora fryzjera.
-        if (pthread_create(&fryzjerzy[i], NULL, fryzjer, id) != 0) { // Tworzenie wątku dla fryzjera.
+        *id = i + 1;
+
+        if (pthread_create(&fryzjerzy[i], NULL, fryzjer, id) != 0) {
             perror("Błąd tworzenia wątku fryzjera");
             exit(EXIT_FAILURE);
         }
     }
 
-    for (int i = 0; i < MAX_FRYZJEROW; i++) {
-        pthread_join(fryzjerzy[i], NULL); // Oczekiwanie na zakończenie wątków fryzjerów (teoretycznie nigdy się nie kończą).
+    for (int i = 0; i < 3; i++) {
+        pthread_join(fryzjerzy[i], NULL);
     }
 
-    usun_semafor(semafor_fotele); // Usunięcie semafora po zakończeniu programu.
+    // Usuwanie semaforow
+    usun_semafor(semafor_poczekalnia);
+    usun_semafor(semafor_fotele);
 
     return 0;
 }

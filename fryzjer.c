@@ -4,11 +4,10 @@
 #include <unistd.h>
 #include <pthread.h>
 
-#define MAX_FOTELE 5 // Liczba foteli w salonie
-#define MAX_POCZEKALNIA 10 // Liczba miejsc w poczekalni
+#define MAX_FOTELE 5
 
-int semafor_poczekalnia; // Semafor do zarzadzania poczekalnia
-int semafor_fotele;     // Semafor do zarzadzania fotelami
+extern int semafor_poczekalnia;
+extern int semafor_fotele;
 
 void* fryzjer(void* arg) {
     int fryzjer_id = *(int*)arg;
@@ -25,7 +24,7 @@ void* fryzjer(void* arg) {
         // Zajmuje fotel
         semafor_p(semafor_fotele, 0);
 
-        // Symulacja strzyzenia
+        // Zajmuje klienta i wykonuje strzyżenie
         printf("Fryzjer %d strzyze klienta.\n", fryzjer_id);
         sleep(rand() % 3 + 1);
 
@@ -33,47 +32,11 @@ void* fryzjer(void* arg) {
 
         // Zwolnienie fotela
         semafor_v(semafor_fotele, 0);
+
+        // Sprawdzenie, czy są kolejni klienci w poczekalni
+        // Fryzjer nie będzie czekał na puste fotelki, tylko kontynuuje pracę
+        semafor_v(semafor_poczekalnia, 0); // Informuje, że fotel jest wolny
     }
 
     return NULL;
-}
-
-int main() {
-    srand(time(NULL));
-
-    // Tworzenie semaforow dla poczekalni i foteli
-    key_t klucz_poczekalnia = ftok("./", 'P');
-    key_t klucz_fotele = ftok("./", 'F');
-
-    semafor_poczekalnia = utworz_semafor(klucz_poczekalnia, 1);
-    semafor_fotele = utworz_semafor(klucz_fotele, 1);
-
-    inicjalizuj_semafor(semafor_poczekalnia, 0, MAX_POCZEKALNIA); // Ustawienie miejsc w poczekalni
-    inicjalizuj_semafor(semafor_fotele, 0, MAX_FOTELE);
-
-    pthread_t fryzjerzy[3];
-
-    for (int i = 0; i < 3; i++) {
-        int* id = malloc(sizeof(int));
-        if (id == NULL) {
-            perror("Błąd alokacji pamięci dla ID fryzjera");
-            exit(EXIT_FAILURE);
-        }
-        *id = i + 1;
-
-        if (pthread_create(&fryzjerzy[i], NULL, fryzjer, id) != 0) {
-            perror("Błąd tworzenia wątku fryzjera");
-            exit(EXIT_FAILURE);
-        }
-    }
-
-    for (int i = 0; i < 3; i++) {
-        pthread_join(fryzjerzy[i], NULL);
-    }
-
-    // Usuwanie semaforow
-    usun_semafor(semafor_poczekalnia);
-    usun_semafor(semafor_fotele);
-
-    return 0;
 }

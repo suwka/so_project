@@ -16,7 +16,7 @@
 int utworz_semafor(key_t klucz, int liczba_semaforow) {
     int semafor_id = semget(klucz, liczba_semaforow, IPC_CREAT | 0666);
     if (semafor_id == -1) {
-        perror("Błąd tworzenia semafora");
+        perror("Blad tworzenia semafora");
         exit(EXIT_FAILURE);
     }
     return semafor_id;
@@ -25,12 +25,12 @@ int utworz_semafor(key_t klucz, int liczba_semaforow) {
 // Usuwanie semafora
 void usun_semafor(int semafor_id) {
     if (semctl(semafor_id, 0, IPC_RMID) == -1) {
-        perror("Błąd usuwania semafora");
+        perror("Blad usuwania semafora");
         exit(EXIT_FAILURE);
     }
 }
 
-// Zwiększenie semafora
+// Zwiekszenie semafora
 void semafor_v(int semafor_id, int numer_semafora) {
     struct sembuf bufor_sem;
     bufor_sem.sem_num = numer_semafora;
@@ -58,25 +58,25 @@ void semafor_p(int semafor_id, int numer_semafora) {
         if (errno == EINTR)
             continue;
         else {
-            perror("Problem z zamknięciem semafora");
+            perror("Problem z zamknieciem semafora");
             exit(EXIT_FAILURE);
         }
     }
 }
 
-// Ustawienie wartości semafora
+// Inicjalizacja semafora
 void inicjalizuj_semafor(int semafor_id, int numer_semafora, int wartosc) {
     if (semctl(semafor_id, numer_semafora, SETVAL, wartosc) == -1) {
-        perror("Błąd inicjalizacji semafora");
+        perror("Blad inicjalizacji semafora");
         exit(EXIT_FAILURE);
     }
 }
 
-// Pobranie wartości semafora
+// Pobranie wartosci semafora
 int pobierz_wartosc_semafora(int semafor_id, int numer_semafora) {
     int wartosc = semctl(semafor_id, numer_semafora, GETVAL);
     if (wartosc == -1) {
-        perror("Błąd pobrania wartości semafora");
+        perror("Blad pobrania wartosci semafora");
         exit(EXIT_FAILURE);
     }
     return wartosc;

@@ -15,31 +15,32 @@ void* fryzjer(void* arg) {
     while (1) {
         printf("Fryzjer %d czeka na klienta.\n", fryzjer_id);
 
-        // Sprawdza, czy jest klient w poczekalni
         semafor_p(semafor_poczekalnia, 0);
 
-        // Przydziela fotel fryzjerowi
-        static int fotel_id = 0; // Numeracja foteli (statyczna zmienna, współdzielona)
-        int aktualny_fotel = fotel_id; // Aktualny fotel dla tego fryzjera
-        fotel_id = ((fotel_id + 1) % MAX_FOTELE)+1; // Cykl przez fotele
+        //IDENTYFIKACJA FOTELI (nw czy poprawnie ale dziala - do przepatrzenia)
+        static int fotel_id = 0;
+        int aktualny_fotel = fotel_id;
+        fotel_id = ((fotel_id + 1) % MAX_FOTELE)+1;
 
         printf("Fryzjer %d znalazł klienta i sadza go na fotelu %d.\n", fryzjer_id, aktualny_fotel);
 
-        // Zajmuje fotel
         semafor_p(semafor_fotele, 0);
 
-        // Wykonuje strzyżenie
         printf("Fryzjer %d strzyże klienta na fotelu %d.\n", fryzjer_id, aktualny_fotel);
         sleep(rand() % 3 + 1);
 
         printf("Fryzjer %d skończył strzyżenie klienta na fotelu %d i zwalnia fotel.\n", fryzjer_id, aktualny_fotel);
 
-        // Zwolnienie fotela
         semafor_v(semafor_fotele, 0);
-
-        // Informuje, że fotel jest wolny
         semafor_v(semafor_poczekalnia, 0);
     }
 
     return NULL;
 }
+
+
+/*
+    pierwszy semafor sprawdza czy kliencik czeka w poczekalni
+    drugi semaforek rezerwuje fotel
+    na koncu zwalnianie semforów
+*/

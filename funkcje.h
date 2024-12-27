@@ -14,6 +14,11 @@
 #include <pthread.h>
 #include <sys/msg.h>
 
+#define LICZBA_FRYZJEROW 5
+#define LICZBA_KLIENTOW 15
+#define MAX_POCZEKALNIA 10
+#define MAX_FOTELE 3
+
 // Tworzenie semafora
 int utworz_semafor(key_t klucz, int liczba_semaforow);
 

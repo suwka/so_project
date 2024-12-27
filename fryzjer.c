@@ -4,7 +4,6 @@
 #include <unistd.h>
 #include <pthread.h>
 
-#define MAX_FOTELE 5
 
 extern int semafor_poczekalnia;
 extern int semafor_fotele;
@@ -19,23 +18,27 @@ void* fryzjer(void* arg) {
         // Sprawdza, czy jest klient w poczekalni
         semafor_p(semafor_poczekalnia, 0);
 
-        printf("Fryzjer %d znalazl klienta i sadza go na fotelu.\n", fryzjer_id);
+        // Przydziela fotel fryzjerowi
+        static int fotel_id = 0; // Numeracja foteli (statyczna zmienna, współdzielona)
+        int aktualny_fotel = fotel_id; // Aktualny fotel dla tego fryzjera
+        fotel_id = ((fotel_id + 1) % MAX_FOTELE)+1; // Cykl przez fotele
+
+        printf("Fryzjer %d znalazł klienta i sadza go na fotelu %d.\n", fryzjer_id, aktualny_fotel);
 
         // Zajmuje fotel
         semafor_p(semafor_fotele, 0);
 
-        // Zajmuje klienta i wykonuje strzyżenie
-        printf("Fryzjer %d strzyze klienta.\n", fryzjer_id);
+        // Wykonuje strzyżenie
+        printf("Fryzjer %d strzyże klienta na fotelu %d.\n", fryzjer_id, aktualny_fotel);
         sleep(rand() % 3 + 1);
 
-        printf("Fryzjer %d skonczyl strzyzenie klienta i zwalnia fotel.\n", fryzjer_id);
+        printf("Fryzjer %d skończył strzyżenie klienta na fotelu %d i zwalnia fotel.\n", fryzjer_id, aktualny_fotel);
 
         // Zwolnienie fotela
         semafor_v(semafor_fotele, 0);
 
-        // Sprawdzenie, czy są kolejni klienci w poczekalni
-        // Fryzjer nie będzie czekał na puste fotelki, tylko kontynuuje pracę
-        semafor_v(semafor_poczekalnia, 0); // Informuje, że fotel jest wolny
+        // Informuje, że fotel jest wolny
+        semafor_v(semafor_poczekalnia, 0);
     }
 
     return NULL;

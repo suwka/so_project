@@ -4,11 +4,6 @@
 #include <unistd.h>
 #include <pthread.h>
 
-#define LICZBA_FRYZJEROW 5
-#define LICZBA_KLIENTOW 15
-#define MAX_POCZEKALNIA 10
-#define MAX_FOTELE 3
-
 int semafor_poczekalnia;
 int semafor_fotele;
 

@@ -34,6 +34,7 @@ extern const int NOMINALY[LICZBA_NOMINALOW];
 
 void inicjalizuj_zasoby();
 void zwolnij_zasoby();
+void proces_kierownika();
 void proces_fryzjera();
 void proces_klienta();
 void operacja_semaforowa(int semid, int semnum, int operacja);

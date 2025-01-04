@@ -8,6 +8,15 @@ int main() {
     signal(SIGINT, zwolnij_zasoby);
     inicjalizuj_zasoby();
 
+    pid_t pid_kierownika;
+
+    // Uruchamiamy proces kierownika
+    if ((pid_kierownika = fork()) == 0) {
+        proces_kierownika();
+        exit(0);
+    }
+
+    // Uruchamiamy procesy fryzjerów
     for (int i = 0; i < FRYZJERZY; i++) {
         if (fork() == 0) {
             proces_fryzjera();
@@ -15,6 +24,7 @@ int main() {
         }
     }
 
+    // Uruchamiamy procesy klientów
     for (int i = 0; i < KLIENCI; i++) {
         if (fork() == 0) {
             proces_klienta();
@@ -22,7 +32,8 @@ int main() {
         }
     }
 
-    for (int i = 0; i < FRYZJERZY + KLIENCI; i++) {
+    // Oczekujemy na zakończenie wszystkich procesów
+    for (int i = 0; i < FRYZJERZY + KLIENCI + 1; i++) { // +1 dla kierownika
         wait(NULL);
     }
 

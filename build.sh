@@ -1,7 +1,7 @@
 #!/bin/bash
 
 OUTPUT="salon"
-FILES="fryzjer.c funkcje.c klient.c main.c"
+FILES="fryzjer.c funkcje.c klient.c main.c kierownik.c"
 LIBS="-lpthread"
 
 gcc -o $OUTPUT $FILES $LIBS

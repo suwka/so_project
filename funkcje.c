@@ -44,6 +44,11 @@ void inicjalizuj_zasoby() {
         kasa->banknoty[i] = startowe_banknoty[i];
     }
 
+    // Semafor 0 - zarządzanie dostępnością miejsc w poczekalni
+    // Semafor 1 - zarządzanie dostępnością foteli fryzjerskich
+    // Semafor 2 - synchronizuje komunikację między klientem a fryzjerem (gotowość do strzyżenia).
+    // Semafor 3 - zapewnia wyłączny dostęp do zasobów współdzielonych (kasa)
+
     semctl(semafor, 0, SETVAL, POCZEKALNIA);
     semctl(semafor, 1, SETVAL, FOTELE);
     semctl(semafor, 2, SETVAL, 0);

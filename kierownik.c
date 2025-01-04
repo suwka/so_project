@@ -9,6 +9,13 @@
 #include <time.h>
 #include "funkcje.h"
 
+/*
+
+problem kierownika jest taki ze zabija wszystkich klientow zamiast ich wypraszac z salonu - do rozwiazania
+
+*/
+
+
 void proces_kierownika() {
     srand(time(NULL));
 

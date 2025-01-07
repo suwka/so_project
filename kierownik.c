@@ -11,14 +11,6 @@
 #include <string.h>
 #include <sys/prctl.h>
 
-
-/*
-
-problem kierownika jest taki ze zabija wszystkich klientow zamiast ich wypraszac z salonu - do rozwiazania
-
-*/
-
-
 void proces_kierownika() {
     srand(time(NULL));
     prctl(PR_SET_NAME, "kierownik", 0, 0, 0);
@@ -36,9 +28,10 @@ void proces_kierownika() {
             printf("Kierownik: Ewakuacja klientów!\n");
             for (int i = 0; i < KLIENCI; i++) {
                 pid_t pid_klienta = getpid() + FRYZJERZY + i + 1;
-                kill(pid_klienta, SIGTERM);
-                printf("Kierownik: Klient o PID %d został wyproszony.\n", pid_klienta);
+                kill(pid_klienta, SIGUSR1); // Sygnał ewakuacji
             }
         }
     }
 }
+
+

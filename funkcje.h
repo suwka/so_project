@@ -44,4 +44,7 @@ int oblicz_sume_banknotow(const int *banknoty);
 void dodaj_banknoty(int *cel, const int *zrodlo);
 int zaplac(int *zrodlo, int kwota, int *cel);
 
+void wyczysc_kolejke(int kolejka);
+
+
 #endif

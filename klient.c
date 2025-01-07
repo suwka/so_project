@@ -11,19 +11,36 @@
 #include <string.h>
 #include <sys/prctl.h>
 
+volatile sig_atomic_t ewakuacja = 0;
+
+void obsluz_sygnal(int sig) {
+    printf("Klient %d: Otrzymałem sygnał ewakuacji.\n", getpid());
+    ewakuacja = 1;
+}
 
 void proces_klienta() {
+    signal(SIGUSR1, obsluz_sygnal); // Obsługa sygnału do opuszczenia salonu
     Klient klient;
     inicjalizuj_klienta(&klient);
 
     srand(getpid());
     prctl(PR_SET_NAME, "klient", 0, 0, 0);
+
     while (1) {
+        if (ewakuacja) {
+            //printf("Klient %d się ewakuuje.\n", getpid());
+            operacja_semaforowa(semafor, 0, 1); // Zwolnienie miejsca w poczekalni
+            operacja_semaforowa(semafor, 1, 1); // Zwolnienie fotela
+            ewakuacja = 0; // Reset flagi
+            sleep(rand() % 5 + 1); // Chwila przerwy przed powrotem
+            continue;
+        }
+
         sleep(rand() % 3 + 1);
 
         printf("Klient %d przychodzi do salonu.\n", getpid());
         if (semop(semafor, (struct sembuf[]){{0, -1, IPC_NOWAIT}}, 1) == -1) {
-            printf("Klient %d opuszcza salon.\n", getpid());
+            printf("Klient %d opuszcza salon, bo jest pełno.\n", getpid());
             sleep(rand() % 5 + 1);
             int losowy_nominal = rand() % LICZBA_NOMINALOW;
             klient.banknoty[losowy_nominal]++;
@@ -55,7 +72,7 @@ void proces_klienta() {
 
         msgrcv(kolejka, &wiad, sizeof(Wiadomosc) - sizeof(long), getpid(), 0);
 
-        printf("Klient %d wychodzi.\n", getpid());
+        printf("Klient %d wychodzi z salonu.\n", getpid());
         operacja_semaforowa(semafor, 1, 1);
         operacja_semaforowa(semafor, 0, 1);
 

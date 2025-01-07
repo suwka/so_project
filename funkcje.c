@@ -151,3 +151,12 @@ void operacja_semaforowa(int semid, int semnum, int operacja) {
         exit(EXIT_FAILURE);
     }
 }
+
+void wyczysc_kolejke(int kolejka) {
+    Wiadomosc wiad;
+    while (msgrcv(kolejka, &wiad, sizeof(Wiadomosc) - sizeof(long), 0, IPC_NOWAIT) != -1) {
+        // Czyszczenie kolejki
+    }
+    printf("Kolejka komunikatów została wyczyszczona.\n");
+}
+

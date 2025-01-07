@@ -11,6 +11,14 @@
 #include <sys/prctl.h>
 #include <string.h>
 
+/*
+        to do:
+            godziny otwarcia zamkniecia salonu (dodac czas symulacji)
+            w przypadku zwolnienia wszystkich fryzjerow koniec symulacji
+
+*/
+
+
 void proces_fryzjera() {
     prctl(PR_SET_NAME, "fryzjer", 0, 0, 0);
     while (1) {

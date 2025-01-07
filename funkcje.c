@@ -5,7 +5,21 @@
 #include <sys/sem.h>
 #include <sys/msg.h>
 #include <sys/shm.h>
+#include <string.h>
 #include "funkcje.h"
+#include <sys/prctl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/ipc.h>
+#include <sys/sem.h>
+#include <sys/msg.h>
+#include <sys/types.h>
+#include <signal.h>
+#include <time.h>
+#include <string.h>
+#include <sys/prctl.h>
+
 
 int semafor, kolejka, pamiec_kasy;
 Kasa *kasa;

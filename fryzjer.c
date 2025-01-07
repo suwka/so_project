@@ -8,8 +8,11 @@
 #include <signal.h>
 #include <time.h>
 #include "funkcje.h"
+#include <sys/prctl.h>
+#include <string.h>
 
 void proces_fryzjera() {
+    prctl(PR_SET_NAME, "fryzjer", 0, 0, 0);
     while (1) {
         operacja_semaforowa(semafor, 2, -1);
         operacja_semaforowa(semafor, 1, -1);

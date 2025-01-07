@@ -8,13 +8,16 @@
 #include <signal.h>
 #include <time.h>
 #include "funkcje.h"
+#include <string.h>
+#include <sys/prctl.h>
+
 
 void proces_klienta() {
     Klient klient;
     inicjalizuj_klienta(&klient);
 
     srand(getpid());
-
+    prctl(PR_SET_NAME, "klient", 0, 0, 0);
     while (1) {
         sleep(rand() % 3 + 1);
 

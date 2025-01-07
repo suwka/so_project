@@ -8,6 +8,9 @@
 #include <signal.h>
 #include <time.h>
 #include "funkcje.h"
+#include <string.h>
+#include <sys/prctl.h>
+
 
 /*
 
@@ -18,14 +21,13 @@ problem kierownika jest taki ze zabija wszystkich klientow zamiast ich wypraszac
 
 void proces_kierownika() {
     srand(time(NULL));
-
+    prctl(PR_SET_NAME, "kierownik", 0, 0, 0);
     while (1) {
         sleep(rand() % 10 + 5); // 5-15 sekund
 
         int akcja = rand() % 2; // 0 - zwolnienie fryzjera, 1 - ewakuacja klientów
 
         if (akcja == 0) {
-            printf("Kierownik: Zwolnienie fryzjera.\n");
             int losowy_fryzjer = rand() % FRYZJERZY;
             pid_t pid_fryzjera = getpid() + losowy_fryzjer + 1;
             kill(pid_fryzjera, SIGTERM);

@@ -2,9 +2,12 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <string.h>
 #include "funkcje.h"
+#include <sys/prctl.h>
 
-int main() {
+
+int main(int argc, char *argv[]) {
     signal(SIGINT, zwolnij_zasoby);
     inicjalizuj_zasoby();
 
@@ -12,6 +15,7 @@ int main() {
 
     // Uruchamiamy proces kierownika
     if ((pid_kierownika = fork()) == 0) {
+        strcpy(argv[0], "kierownik");
         proces_kierownika();
         exit(0);
     }
@@ -19,6 +23,7 @@ int main() {
     // Uruchamiamy procesy fryzjerów
     for (int i = 0; i < FRYZJERZY; i++) {
         if (fork() == 0) {
+            strcpy(argv[0], "fryzjer");
             proces_fryzjera();
             exit(0);
         }
@@ -27,13 +32,13 @@ int main() {
     // Uruchamiamy procesy klientów
     for (int i = 0; i < KLIENCI; i++) {
         if (fork() == 0) {
+            strcpy(argv[0], "klient");
             proces_klienta();
             exit(0);
         }
     }
 
-    // Oczekujemy na zakończenie wszystkich procesów
-    for (int i = 0; i < FRYZJERZY + KLIENCI + 1; i++) { // +1 dla kierownika
+    for (int i = 0; i < FRYZJERZY + KLIENCI + 1; i++) {
         wait(NULL);
     }
 

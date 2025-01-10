@@ -68,13 +68,9 @@ void proces_klienta() {
         }
 
         Wiadomosc wiad = {1, getpid(), rand() % 3 + 1};
-        if (msgsnd(kolejka, &wiad, sizeof(Wiadomosc) - sizeof(long), 0) == -1 ) {
-            perror("Klient nie mógł wysłać wiadomości");
-        };
+        msgsnd(kolejka, &wiad, sizeof(Wiadomosc) - sizeof(long), 0);
 
-        if (msgrcv(kolejka, &wiad, sizeof(Wiadomosc) - sizeof(long), getpid(), 0) == -1 ) {
-            perror("Klient nie mógł odebrać wiadomości");
-        };
+        msgrcv(kolejka, &wiad, sizeof(Wiadomosc) - sizeof(long), getpid(), 0);
 
         printf("Klient %d wychodzi z salonu.\n", getpid());
         operacja_semaforowa(semafor, 1, 1);

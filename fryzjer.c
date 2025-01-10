@@ -10,6 +10,8 @@
 #include "funkcje.h"
 #include <sys/prctl.h>
 #include <string.h>
+#include <errno.h>
+
 
 /*
         to do:
@@ -26,13 +28,19 @@ void proces_fryzjera() {
         operacja_semaforowa(semafor, 1, -1);
 
         Wiadomosc wiad;
-        msgrcv(kolejka, &wiad, sizeof(Wiadomosc) - sizeof(long), 1, 0);
+        if (msgrcv(kolejka, &wiad, sizeof(Wiadomosc) - sizeof(long), 1, 0) == -1 ) {
+            perror("Błąd odbioru wiadomości");
+            fprintf(stderr, "Kod błędu errno: %d, opis błędu: %s\n", errno, strerror(errno));
+        };
 
         printf("Fryzjer %d strzyże klienta %d.\n", getpid(), wiad.id_klienta);
         sleep(wiad.czas);
 
         wiad.typ = wiad.id_klienta;
-        msgsnd(kolejka, &wiad, sizeof(Wiadomosc) - sizeof(long), 0);
+        if (msgsnd(kolejka, &wiad, sizeof(Wiadomosc) - sizeof(long), 0) == -1 ) {
+            perror("Błąd wysyłania wiadomości");
+            fprintf(stderr, "Kod błędu errno: %d, opis błędu: %s\n", errno, strerror(errno));
+        };
 
         printf("Fryzjer %d zakończył strzyżenie klienta %d.\n", getpid(), wiad.id_klienta);
         operacja_semaforowa(semafor, 1, 1);

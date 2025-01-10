@@ -10,6 +10,7 @@
 #include "funkcje.h"
 #include <string.h>
 #include <sys/prctl.h>
+#include <errno.h>
 
 void proces_kierownika() {
     srand(time(NULL));
@@ -22,7 +23,16 @@ void proces_kierownika() {
         if (akcja == 0) {
             int losowy_fryzjer = rand() % FRYZJERZY;
             pid_t pid_fryzjera = getpid() + losowy_fryzjer + 1;
-            kill(pid_fryzjera, SIGTERM);
+            if(kill(pid_fryzjera, SIGTERM) == -1) {
+                perror("Błąd zwolnienia fryzjera");
+                fprintf(stderr, "Kod błędu errno: %d, opis błędu %s\n", errno, strerror(errno));
+                if (errno == ESRCH) {
+                    fprintf(stderr, "Proces o PID %d nie istnieje.\n", pid_fryzjera);
+                } else if (errno == EPERM) {
+                    fprintf(stderr, "Brak uprawnień do wysłania sygnału do procesu o PID %d.\n", pid_fryzjera);
+                }
+
+            };
             printf("Kierownik: Zwolniono fryzjera o PID %d.\n", pid_fryzjera);
         } else {
             printf("Kierownik: Ewakuacja klientów!\n");

@@ -19,6 +19,7 @@
 #include <time.h>
 #include <string.h>
 #include <sys/prctl.h>
+#include <errno.h>
 
 
 int semafor, kolejka, pamiec_kasy;
@@ -148,6 +149,7 @@ void operacja_semaforowa(int semid, int semnum, int operacja) {
     struct sembuf operacja_semaf = {semnum, operacja, 0};
     if (semop(semid, &operacja_semaf, 1) == -1) {
         perror("Błąd operacji semaforowej");
+        fprintf(stderr, "Kod błędu: %d\n", errno);
         exit(EXIT_FAILURE);
     }
 }

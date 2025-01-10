@@ -17,6 +17,7 @@
         to do:
             godziny otwarcia zamkniecia salonu (dodac czas symulacji)
             w przypadku zwolnienia wszystkich fryzjerow koniec symulacji
+            synchronizacja zamkniecia salonu na czas ewakuacji
 
 */
 

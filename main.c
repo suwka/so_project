@@ -7,8 +7,14 @@
 #include <sys/prctl.h>
 
 
+void zakoncz_symulacje(int sig) {
+    printf("Zakończenie symulacji.\n");
+    zwolnij_zasoby();
+    exit(0);
+}
+
 int main(int argc, char *argv[]) {
-    signal(SIGINT, zwolnij_zasoby);
+    signal(SIGINT, zakoncz_symulacje); // Dodanie obsługi SIGINT
     inicjalizuj_zasoby();
 
     pid_t pid_kierownika;

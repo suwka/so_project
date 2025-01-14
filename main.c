@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
     pid_t pid_kierownika;
 
     int czas_symulacji = (CZAS_ZAMKNIECIA - CZAS_OTWARCIA) * GODZINA;
-    printf("Symulacja czasu pracy salonu: %d godzin będzie trwać %d sekund.\n", 
+    printf(ORANGE "Symulacja czasu pracy salonu: %d godzin będzie trwać %d sekund.\n", 
            CZAS_ZAMKNIECIA - CZAS_OTWARCIA, czas_symulacji);
     sleep(3);
     time_t start = time(NULL);
@@ -54,6 +54,17 @@ int main(int argc, char *argv[]) {
     // Czekamy na zakończenie symulacji
     while (difftime(time(NULL), start) < czas_symulacji) {
         sleep(1); // Sprawdzanie co sekundę
+    }
+
+    FILE *plik = fopen("stan_symulacji.txt", "w");
+    if (plik != NULL) {
+        fprintf(plik, "Stan kasy na koniec symulacji:\n");
+        for (int i = 0; i < LICZBA_NOMINALOW; i++) {
+            fprintf(plik, "%d zł: %d banknotów\n", NOMINALY[i], kasa->banknoty[i]);
+        }
+        fclose(plik);
+    } else {
+        perror("Błąd otwarcia pliku do zapisu");
     }
 
     printf("Czas symulacji upłynął. Zakończono symulację z powodu zakończenia czasu pracy salonu.\n");

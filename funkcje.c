@@ -12,6 +12,8 @@
 #include <signal.h>
 #include <time.h>
 #include <errno.h>
+#include <sys/types.h>
+#include <signal.h>
 
 
 int semafor, kolejka, pamiec_kasy;
@@ -97,12 +99,12 @@ void dodaj_banknoty(int *cel, const int *zrodlo) {
 int zaplac(int *zrodlo, int kwota, int *cel) {
     int suma_klienta = oblicz_sume_banknotow(zrodlo);
     if (suma_klienta < kwota) {
-        printf("Niewystarczające środki. Klient posiada: %d, potrzebuje: %d\n", suma_klienta, kwota);
+        printf(KASA_COLOR "Niewystarczające środki. Klient posiada: " VALUE_COLOR "%d" KASA_COLOR ", potrzebuje: " VALUE_COLOR "%d\n" VALUE_COLOR, suma_klienta, kwota);
         return 0;
     }
 
     int reszta = suma_klienta - kwota;
-    printf("Kwota do zapłaty: %d, suma klienta: %d, reszta do wydania: %d\n", kwota, suma_klienta, reszta);
+    printf(KASA_COLOR "Kwota do zapłaty: " VALUE_COLOR "%d" KASA_COLOR ", suma klienta: " VALUE_COLOR "%d" KASA_COLOR ", reszta do wydania: " VALUE_COLOR "%d\n" VALUE_COLOR, kwota, suma_klienta, reszta);
 
     for (int i = LICZBA_NOMINALOW - 1; i >= 0; i--) {
         while (zrodlo[i] > 0 && suma_klienta > 0) {
@@ -125,19 +127,22 @@ int zaplac(int *zrodlo, int kwota, int *cel) {
         }
 
         if (!wydano_reszte) {
-            printf("Brak odpowiednich nominałów w kasie. Oczekiwanie na dostępne banknoty.\n");
+            printf(KASA_COLOR "Brak odpowiednich nominałów w kasie. Oczekiwanie na dostępne banknoty.\n" VALUE_COLOR);
             sleep(1); 
         }
     }
 
     if (reszta > 0) {
-        printf("Nie udało się wydać pełnej reszty. Pozostała reszta: %d\n", reszta);
+        printf(KASA_COLOR "Nie udało się wydać pełnej reszty. Pozostała reszta: " VALUE_COLOR "%d\n" VALUE_COLOR, reszta);
         return 0;
     }
 
-    printf("Transakcja zakończona sukcesem. Reszta wydana w pełni.\n");
+    printf(KASA_COLOR "Transakcja zakończona sukcesem. Reszta wydana w pełni.\n" VALUE_COLOR);
     return 1;
 }
+
+#define VALUE_COLOR "\033[0m"
+#define VALUE_COLOR "\033[0m"
 
 void operacja_semaforowa(int semid, int semnum, int operacja) {
     struct sembuf operacja_semaf = {semnum, operacja, 0};
@@ -153,6 +158,6 @@ void wyczysc_kolejke(int kolejka) {
     while (msgrcv(kolejka, &wiad, sizeof(Wiadomosc) - sizeof(long), 0, IPC_NOWAIT) != -1) {
         // Czyszczenie kolejki
     }
-    printf("Kolejka komunikatów została wyczyszczona.\n");
+    printf(KIEROWNIK_COLOR "Kolejka komunikatów została wyczyszczona.\n" VALUE_COLOR);
 }
 

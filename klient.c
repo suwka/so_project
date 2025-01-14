@@ -14,12 +14,12 @@
 volatile sig_atomic_t ewakuacja = 0;
 
 void obsluz_sygnal(int sig) {
-    printf("Klient %d: Otrzymałem sygnał ewakuacji.\n", getpid());
+    printf(KLIENT_COLOR "Klient " PID_COLOR "%d" KLIENT_COLOR ": Otrzymałem sygnał ewakuacji.\n" PID_COLOR, getpid());
     ewakuacja = 1;
 }
 
 void proces_klienta() {
-    signal(SIGUSR1, obsluz_sygnal); // Obsługa sygnału do opuszczenia salonu
+    signal(SIGUSR1, obsluz_sygnal);
     Klient klient;
     inicjalizuj_klienta(&klient);
 
@@ -28,7 +28,6 @@ void proces_klienta() {
 
     while (1) {
         if (ewakuacja) {
-            //printf("Klient %d się ewakuuje.\n", getpid());
             operacja_semaforowa(semafor, 0, 1);
             operacja_semaforowa(semafor, 1, 1);
             ewakuacja = 0;
@@ -40,35 +39,34 @@ void proces_klienta() {
 
         int czy_ewakuacja = semctl(semafor, 4, GETVAL);
         if (czy_ewakuacja == 0) {
-            //printf("Klient %d: Ewakuacja w toku, nie wchodzę.\n", getpid());
             sleep(rand() % 5 + 1);
             continue;
         }
 
-        printf("Klient %d przychodzi do salonu.\n", getpid());
+        printf(KLIENT_COLOR "Klient " PID_COLOR "%d" KLIENT_COLOR " przychodzi do salonu.\n" PID_COLOR, getpid());
         if (semop(semafor, (struct sembuf[]){{0, -1, IPC_NOWAIT}}, 1) == -1) {
-            printf("Klient %d opuszcza salon, bo jest pełno.\n", getpid());
+            printf(KLIENT_COLOR "Klient " PID_COLOR "%d" KLIENT_COLOR " opuszcza salon, bo jest pełno.\n" PID_COLOR, getpid());
             sleep(rand() % 5 + 1);
             int losowy_nominal = rand() % LICZBA_NOMINALOW;
             klient.banknoty[losowy_nominal]++;
-            printf("Klient %d zarabia banknot %d zl.\n", getpid(), NOMINALY[losowy_nominal]);
+            printf(KLIENT_COLOR "Klient " PID_COLOR "%d" KLIENT_COLOR " zarabia banknot " VALUE_COLOR "%d" KLIENT_COLOR " zł.\n" PID_COLOR, getpid(), NOMINALY[losowy_nominal]);
             continue;
         }
 
-        printf("Klient %d czeka na fotel.\n", getpid());
+        printf(KLIENT_COLOR "Klient " PID_COLOR "%d" KLIENT_COLOR " czeka na fotel.\n" PID_COLOR, getpid());
         operacja_semaforowa(semafor, 2, 1);
 
         if (oblicz_sume_banknotow(klient.banknoty) < KOSZT_USLUGI) {
-            printf("Klient %d nie ma wystarczająco pieniędzy, opuszcza salon.\n", getpid());
+            printf(KLIENT_COLOR "Klient " PID_COLOR "%d" KLIENT_COLOR " nie ma wystarczająco pieniędzy, opuszcza salon.\n" PID_COLOR, getpid());
             operacja_semaforowa(semafor, 0, 1);
             operacja_semaforowa(semafor, 2, -1);
             continue;
         }
 
         if (zaplac(klient.banknoty, KOSZT_USLUGI, kasa->banknoty)) {
-            printf("Klient %d płaci %d zl za usługę.\n", getpid(), KOSZT_USLUGI);
+            printf(KLIENT_COLOR "Klient " PID_COLOR "%d" KLIENT_COLOR " płaci " VALUE_COLOR "%d" KLIENT_COLOR " zł za usługę.\n" PID_COLOR, getpid(), KOSZT_USLUGI);
         } else {
-            printf("Klient %d ma problem z płatnością.\n", getpid());
+            printf(KLIENT_COLOR "Klient " PID_COLOR "%d" KLIENT_COLOR " ma problem z płatnością.\n" PID_COLOR, getpid());
             operacja_semaforowa(semafor, 0, 1);
             operacja_semaforowa(semafor, 2, -1);
             continue;
@@ -79,7 +77,6 @@ void proces_klienta() {
 
         msgrcv(kolejka, &wiad, sizeof(Wiadomosc) - sizeof(long), getpid(), 0);
 
-        //printf("Klient %d wychodzi z salonu.\n", getpid());
         operacja_semaforowa(semafor, 1, 1);
         operacja_semaforowa(semafor, 0, 1);
 

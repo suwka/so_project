@@ -11,15 +11,15 @@
 #include <string.h>
 #include <sys/prctl.h>
 
-volatile sig_atomic_t ewakuacja = 0;
+volatile sig_atomic_t ewakuacja = 0;    //flaga informujaca o ewakuacji strzyzonego (0 brak ewakuacji, 1 ewakuacja)
 
 void obsluz_sygnal(int sig) {
     printf(KLIENT_COLOR "Klient " PID_COLOR "%d" KLIENT_COLOR ": Otrzymałem sygnał ewakuacji.\n" PID_COLOR, getpid());
-    ewakuacja = 1;
+    ewakuacja = 1;      //ewakuacja
 }
 
 void proces_klienta() {
-    signal(SIGUSR1, obsluz_sygnal);
+    signal(SIGUSR1, obsluz_sygnal);     //obsluga sygnalu ewakuacji
     Klient klient;
     inicjalizuj_klienta(&klient);
 
@@ -28,8 +28,8 @@ void proces_klienta() {
 
     while (1) {
         if (ewakuacja) {
-            operacja_semaforowa(semafor, 0, 1);
-            operacja_semaforowa(semafor, 1, 1);
+            operacja_semaforowa(semafor, 0, 1);     //zwalnia miejsce w poczekalni
+            operacja_semaforowa(semafor, 1, 1);     //zwalnia fotel fryzjerski
             ewakuacja = 0;
             sleep(rand() % 5 + 1);
             continue;
@@ -37,6 +37,7 @@ void proces_klienta() {
 
         sleep(rand() % 3 + 1);
 
+        //proba wejscia do salonu, jezeli ewakuacja to sie nie da
         int czy_ewakuacja = semctl(semafor, 4, GETVAL);
         if (czy_ewakuacja == 0) {
             sleep(rand() % 5 + 1);
@@ -54,12 +55,13 @@ void proces_klienta() {
         }
 
         printf(KLIENT_COLOR "Klient " PID_COLOR "%d" KLIENT_COLOR " czeka na fotel.\n" PID_COLOR, getpid());
-        operacja_semaforowa(semafor, 2, 1);
+        operacja_semaforowa(semafor, 2, 1); //informuje fryzjera o gotowosci do strzyzenia
 
+        //czy stac na strzyzenie
         if (oblicz_sume_banknotow(klient.banknoty) < KOSZT_USLUGI) {
             printf(KLIENT_COLOR "Klient " PID_COLOR "%d" KLIENT_COLOR " nie ma wystarczająco pieniędzy, opuszcza salon.\n" PID_COLOR, getpid());
-            operacja_semaforowa(semafor, 0, 1);
-            operacja_semaforowa(semafor, 2, -1);
+            operacja_semaforowa(semafor, 0, 1);     //zwalnia miejsce w poczekalni
+            operacja_semaforowa(semafor, 2, -1);    //wycofuje gotowosc fryzjera
             continue;
         }
 
@@ -72,13 +74,15 @@ void proces_klienta() {
             continue;
         }
 
+        //synchronizacja czasu strzyzenia, klient wysyla do fryzjera czas obslugi
         Wiadomosc wiad = {1, getpid(), rand() % 3 + 1};
         msgsnd(kolejka, &wiad, sizeof(Wiadomosc) - sizeof(long), 0);
 
+        //odbieranie wiadomosci od fryzjera ze strzyzenie sie zakonczylo
         msgrcv(kolejka, &wiad, sizeof(Wiadomosc) - sizeof(long), getpid(), 0);
 
-        operacja_semaforowa(semafor, 1, 1);
-        operacja_semaforowa(semafor, 0, 1);
+        operacja_semaforowa(semafor, 1, 1); //zwolnienie fotela
+        operacja_semaforowa(semafor, 0, 1); //zwolnienie miejsca w poczekalni
 
         sleep(rand() % 30 + 1);
     }

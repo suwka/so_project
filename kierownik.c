@@ -12,7 +12,7 @@
 #include <sys/prctl.h>
 #include <errno.h>
 
-volatile int aktywni_fryzjerzy = FRYZJERZY;
+volatile int aktywni_fryzjerzy = FRYZJERZY      //aktywni fryzjerzy w salonie, potrzebne do zakonczenia symulacji gdzy liczba wyniesie 0
 
 void proces_kierownika() {
     srand(time(NULL));
@@ -39,6 +39,7 @@ void proces_kierownika() {
                 }
             }
         } else {
+            //w przypadku ewakuacji czysci kolejke i blokuje semafor, aby nie dalo sie wejsc do salonu, flaga ewakuacja 1 informuje fryzjra o koniecznosci zakonczenia strzyzenia i wyrzucenia klienta
             printf(KIEROWNIK_COLOR "Kierownik: Ewakuacja klientów - czyszczenie kolejki komunikatów.\n" PID_COLOR);
             wyczysc_kolejke(kolejka);
             operacja_semaforowa(semafor, 4, -1);

@@ -17,6 +17,14 @@ volatile int aktywni_fryzjerzy = FRYZJERZY;      //aktywni fryzjerzy w salonie, 
 void proces_kierownika() {
     srand(time(NULL));
     prctl(PR_SET_NAME, "kierownik", 0, 0, 0);
+
+    // Sprawdzenie początkowego stanu fryzjerów
+    if (aktywni_fryzjerzy == 0) {
+        printf(KIEROWNIK_COLOR "Kierownik: Salon nie może zostać otwarty z powodu braku pracowników. Kończę symulację.\n" PID_COLOR);
+        kill(0, SIGINT);
+        exit(0);
+    }
+
     while (1) {
         sleep(rand() % 10 + 5);
 
@@ -32,7 +40,7 @@ void proces_kierownika() {
                     printf(KIEROWNIK_COLOR "Kierownik: Zwolniono fryzjera o PID " PID_COLOR "%d" KIEROWNIK_COLOR ".\n" PID_COLOR, pid_fryzjera);
                     aktywni_fryzjerzy--;
                     if (aktywni_fryzjerzy == 0) {
-                        printf(KIEROWNIK_COLOR "Kierownik: Wszyscy fryzjerzy zostali zwolnieni. Kończę symulację.\n" PID_COLOR);
+                        printf(KIEROWNIK_COLOR "Kierownik: Wszyscy fryzjerzy zostali zwolnieni. Salon nie może funkcjonować bez pracowników. Kończę symulację.\n" PID_COLOR);
                         kill(0, SIGINT);
                         exit(0);
                     }

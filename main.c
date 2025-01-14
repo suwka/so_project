@@ -21,6 +21,7 @@ int main(int argc, char *argv[]) {
     pid_t pid_kierownika;
 
     int czas_symulacji = (CZAS_ZAMKNIECIA - CZAS_OTWARCIA) * GODZINA;
+    sleep(1);
     printf(ORANGE "Symulacja czasu pracy salonu: %d godzin będzie trwać %d sekund.\n", 
            CZAS_ZAMKNIECIA - CZAS_OTWARCIA, czas_symulacji);
     sleep(3);

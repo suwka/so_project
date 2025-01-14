@@ -4,9 +4,9 @@
 #include <sys/types.h>
 #include <signal.h>
 
-#define FRYZJERZY 5
+#define FRYZJERZY 0
 #define KLIENCI 20
-#define POCZEKALNIA 8
+#define POCZEKALNIA 3
 #define FOTELE 3
 
 #define LICZBA_NOMINALOW 3

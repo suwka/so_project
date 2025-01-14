@@ -1,4 +1,4 @@
 Stan kasy na koniec symulacji:
-10 zł: 119 banknotów
-20 zł: 48 banknotów
-50 zł: 4 banknotów
+10 zł: 75 banknotów
+20 zł: 59 banknotów
+50 zł: 0 banknotów

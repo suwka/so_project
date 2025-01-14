@@ -29,10 +29,10 @@ void proces_klienta() {
     while (1) {
         if (ewakuacja) {
             //printf("Klient %d się ewakuuje.\n", getpid());
-            operacja_semaforowa(semafor, 0, 1); // Zwolnienie miejsca w poczekalni
-            operacja_semaforowa(semafor, 1, 1); // Zwolnienie fotela
-            ewakuacja = 0; // Reset flagi
-            sleep(rand() % 5 + 1); // Chwila przerwy przed powrotem
+            operacja_semaforowa(semafor, 0, 1);
+            operacja_semaforowa(semafor, 1, 1);
+            ewakuacja = 0;
+            sleep(rand() % 5 + 1);
             continue;
         }
 

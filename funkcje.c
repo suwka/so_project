@@ -131,7 +131,7 @@ int zaplac(int *zrodlo, int kwota, int *cel) {
         }
 
         if (!wydano_reszte) {
-            //printf("Brak odpowiednich nominałów w kasie. Oczekiwanie na dostępne banknoty.\n");
+            printf("Brak odpowiednich nominałów w kasie. Oczekiwanie na dostępne banknoty.\n");
             sleep(1); 
         }
     }

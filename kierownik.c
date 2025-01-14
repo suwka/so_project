@@ -39,17 +39,15 @@ void proces_kierownika() {
                 }
             }
         } else {
-            printf("Kierownik: Ewakuacja klientów!\n");
+            printf("Kierownik: Ewakuacja klientów - czyszczenie kolejki komunikatów.\n");
+            wyczysc_kolejke(kolejka);
             operacja_semaforowa(semafor, 4, -1);
-            ewakuacja = 1;
-            for (int i = 0; i < KLIENCI; i++) {
-                pid_t pid_klienta = getpid() + FRYZJERZY + i + 1;
-                kill(pid_klienta, SIGUSR1);
-            }
-            sleep(5);
-            printf("Kierownik: Ewakuacja zakończona.\n");
+            printf("Kierownik: Dostęp do salonu zablokowany.\n");
+            ewakuacja=1;
+            sleep(5); //fryzjerzy, który aktualnie strzygą klientów powinni ich też wyrzucić z salonu
+            ewakuacja=0;
+            printf("Kierownik: Ewakuacja zakończona - odblokowanie dostępu.\n");
             operacja_semaforowa(semafor, 4, 1);
-            ewakuacja = 0;
         }
     }
 }

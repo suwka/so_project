@@ -25,33 +25,37 @@
 void proces_fryzjera() {
     prctl(PR_SET_NAME, "fryzjer", 0, 0, 0);
     while (1) {
+        // Oczekiwanie na klienta
         operacja_semaforowa(semafor, 2, -1);
         operacja_semaforowa(semafor, 1, -1);
 
+        // Odbiór wiadomości o kliencie
         Wiadomosc wiad;
-        if (msgrcv(kolejka, &wiad, sizeof(Wiadomosc) - sizeof(long), 1, 0) == -1 ) {
+        if (msgrcv(kolejka, &wiad, sizeof(Wiadomosc) - sizeof(long), 1, 0) == -1) {
             perror("Błąd odbioru wiadomości");
-            fprintf(stderr, "Kod błędu errno: %d, opis błędu: %s\n", errno, strerror(errno));
         };
 
         printf("Fryzjer %d strzyże klienta %d.\n", getpid(), wiad.id_klienta);
-        sleep(wiad.czas);
 
-        wiad.typ = wiad.id_klienta;
-        if (msgsnd(kolejka, &wiad, sizeof(Wiadomosc) - sizeof(long), 0) == -1 ) {
-            perror("Błąd wysyłania wiadomości");
-            fprintf(stderr, "Kod błędu errno: %d, opis błędu: %s\n", errno, strerror(errno));
-        };
-
-        printf("Fryzjer %d zakończył strzyżenie klienta %d.\n", getpid(), wiad.id_klienta);
-        operacja_semaforowa(semafor, 1, 1);
-
-        printf("Fryzjer %d: Stan kasy:\n", getpid());
-        int suma_kasy = oblicz_sume_banknotow(kasa->banknoty);
-
-        for (int i = 0; i < LICZBA_NOMINALOW; i++) {
-            printf("%d zl: %d banknotów\n", NOMINALY[i], kasa->banknoty[i]);
+        int czas_strzyzenia = wiad.czas;
+        for (int i = 0; i < czas_strzyzenia; i++) {
+            if (ewakuacja) {
+                printf("Fryzjer %d: Przerwano strzyżenie z powodu ewakuacji. Klient %d opuszcza salon.\n", 
+                       getpid(), wiad.id_klienta);
+                break;
+            }
+            sleep(1); // Symulacja upływu czasu strzyżenia
         }
-        printf("Łączna suma w kasie: %d zł\n", suma_kasy);
+
+        // Zakończenie lub przerwanie usługi
+        if (!ewakuacja) {
+            printf("Fryzjer %d zakończył strzyżenie klienta %d.\n", getpid(), wiad.id_klienta);
+            wiad.typ = wiad.id_klienta;
+            if (msgsnd(kolejka, &wiad, sizeof(Wiadomosc) - sizeof(long), 0) == -1) {
+                perror("Błąd wysyłania wiadomości");
+            }
+        }
+
+        operacja_semaforowa(semafor, 1, 1); // Zwolnienie fotela
     }
 }

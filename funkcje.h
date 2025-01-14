@@ -18,7 +18,7 @@
 
 #define CZAS_OTWARCIA 8
 #define CZAS_ZAMKNIECIA 16
-#define GODZINA 1
+#define GODZINA 30
 
 
 typedef struct {

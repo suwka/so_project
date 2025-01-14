@@ -40,7 +40,7 @@ void proces_kierownika() {
             }
         } else {
             printf("Kierownik: Ewakuacja klientów!\n");
-            semctl(semafor, 4, SETVAL, 0);
+            operacja_semaforowa(semafor, 4, -1);
             ewakuacja = 1;
             for (int i = 0; i < KLIENCI; i++) {
                 pid_t pid_klienta = getpid() + FRYZJERZY + i + 1;
@@ -48,7 +48,7 @@ void proces_kierownika() {
             }
             sleep(5);
             printf("Kierownik: Ewakuacja zakończona.\n");
-            semctl(semafor, 4, SETVAL, 1);
+            operacja_semaforowa(semafor, 4, 1);
             ewakuacja = 0;
         }
     }

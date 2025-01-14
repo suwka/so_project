@@ -22,7 +22,7 @@ const int NOMINALY[LICZBA_NOMINALOW] = {10, 20, 50};
 void inicjalizuj_zasoby() {
     key_t klucz = ftok("/tmp", 'S');
 
-    semafor = semget(klucz, 4, IPC_CREAT | 0666);
+    semafor = semget(klucz, 5, IPC_CREAT | 0666);
     if (semafor == -1) {
         perror("Blad semafora");
         exit(EXIT_FAILURE);

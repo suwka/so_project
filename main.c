@@ -9,10 +9,20 @@
 
 
 void zakoncz_symulacje(int sig) {
-    //printf("Zakończenie symulacji.\n");
+    FILE *plik = fopen("stan_symulacji.txt", "w");
+    if (plik != NULL) {
+        fprintf(plik, "Stan kasy na koniec symulacji:\n");
+        for (int i = 0; i < LICZBA_NOMINALOW; i++) {
+            fprintf(plik, "%d zł: %d banknotów\n", NOMINALY[i], kasa->banknoty[i]);
+        }
+        fclose(plik);
+    } else {
+        perror("Błąd otwarcia pliku do zapisu");
+    }
     zwolnij_zasoby();
     exit(0);
 }
+
 
 int main(int argc, char *argv[]) {
     signal(SIGINT, zakoncz_symulacje); // Dodanie obsługi SIGINT

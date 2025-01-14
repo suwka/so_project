@@ -70,6 +70,8 @@ int main(int argc, char *argv[]) {
     printf(ORANGE "Czas symulacji upłynął. Zakończono symulację z powodu zakończenia czasu pracy salonu.\n");
     kill(0, SIGINT); // Wysyłamy sygnał zakończenia do wszystkich procesów
 
+    while (wait(NULL) > 0); // Oczekuje, aż wszystkie dzieci zakończą pracę
+
     zwolnij_zasoby();
     return 0;
 }

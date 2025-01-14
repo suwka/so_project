@@ -12,7 +12,7 @@
 #include <sys/prctl.h>
 #include <errno.h>
 
-volatile int aktywni_fryzjerzy = FRYZJERZY      //aktywni fryzjerzy w salonie, potrzebne do zakonczenia symulacji gdzy liczba wyniesie 0
+volatile int aktywni_fryzjerzy = FRYZJERZY;      //aktywni fryzjerzy w salonie, potrzebne do zakonczenia symulacji gdzy liczba wyniesie 0
 
 void proces_kierownika() {
     srand(time(NULL));

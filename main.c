@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
         perror("Błąd otwarcia pliku do zapisu");
     }
 
-    printf("Czas symulacji upłynął. Zakończono symulację z powodu zakończenia czasu pracy salonu.\n");
+    printf(ORANGE "Czas symulacji upłynął. Zakończono symulację z powodu zakończenia czasu pracy salonu.\n");
     kill(0, SIGINT); // Wysyłamy sygnał zakończenia do wszystkich procesów
 
     zwolnij_zasoby();

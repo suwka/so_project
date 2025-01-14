@@ -115,13 +115,15 @@ void dodaj_banknoty(int *cel, const int *zrodlo) {
 // Funkcja obsługująca płatności klienta
 int zaplac(int *zrodlo, int kwota, int *cel) {
     int suma_klienta = oblicz_sume_banknotow(zrodlo);
+    pid_t pid_klienta = getpid();
+
     if (suma_klienta < kwota) {
-        printf(KASA_COLOR "Niewystarczające środki. Klient posiada: " VALUE_COLOR "%d" KASA_COLOR ", potrzebuje: " VALUE_COLOR "%d\n" VALUE_COLOR, suma_klienta, kwota);
+        printf(KASA_COLOR "Klient PID: " PID_COLOR "%d" KASA_COLOR " - Niewystarczające środki. Klient posiada: " VALUE_COLOR "%d" KASA_COLOR ", potrzebuje: " VALUE_COLOR "%d\n" VALUE_COLOR, pid_klienta, suma_klienta, kwota);
         return 0;
     }
 
     int reszta = suma_klienta - kwota;
-    printf(KASA_COLOR "Kwota do zapłaty: " VALUE_COLOR "%d" KASA_COLOR ", suma klienta: " VALUE_COLOR "%d" KASA_COLOR ", reszta do wydania: " VALUE_COLOR "%d\n" VALUE_COLOR, kwota, suma_klienta, reszta);
+    printf(KASA_COLOR "Klient PID: " PID_COLOR "%d" KASA_COLOR " - Kwota do zapłaty: " VALUE_COLOR "%d" KASA_COLOR ", suma klienta: " VALUE_COLOR "%d" KASA_COLOR ", reszta do wydania: " VALUE_COLOR "%d\n" VALUE_COLOR, pid_klienta, kwota, suma_klienta, reszta);
 
     // Dodawanie wpłaty do kasy
     for (int i = LICZBA_NOMINALOW - 1; i >= 0; i--) {
@@ -146,19 +148,21 @@ int zaplac(int *zrodlo, int kwota, int *cel) {
         }
 
         if (!wydano_reszte) {
-            printf(KASA_COLOR "Brak odpowiednich nominałów w kasie. Oczekiwanie na dostępne banknoty.\n" VALUE_COLOR);
+            printf(KASA_COLOR "Klient PID: " PID_COLOR "%d" KASA_COLOR " - Brak odpowiednich nominałów w kasie. Oczekiwanie na dostępne banknoty.\n" VALUE_COLOR, pid_klienta);
             sleep(1); // Oczekiwanie na dostępne nominały
         }
     }
 
     if (reszta > 0) {
-        printf(KASA_COLOR "Nie udało się wydać pełnej reszty. Pozostała reszta: " VALUE_COLOR "%d\n" VALUE_COLOR, reszta);
+        printf(KASA_COLOR "Klient PID: " PID_COLOR "%d" KASA_COLOR " - Nie udało się wydać pełnej reszty. Pozostała reszta: " VALUE_COLOR "%d\n" VALUE_COLOR, pid_klienta, reszta);
         return 0;
     }
 
-    printf(KASA_COLOR "Transakcja zakończona sukcesem. Reszta wydana w pełni.\n" VALUE_COLOR);
+    printf(KASA_COLOR "Klient PID: " PID_COLOR "%d" KASA_COLOR " - Transakcja zakończona sukcesem. Reszta wydana w pełni.\n" VALUE_COLOR, pid_klienta);
     return 1;
 }
+
+
 
 // Funkcja realizująca operacje semaforowe
 void operacja_semaforowa(int semid, int semnum, int operacja) {

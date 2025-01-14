@@ -4,9 +4,9 @@
 #include <sys/types.h>
 #include <signal.h>
 
-#define FRYZJERZY 3
+#define FRYZJERZY 5
 #define KLIENCI 20
-#define POCZEKALNIA 10
+#define POCZEKALNIA 8
 #define FOTELE 3
 
 #define LICZBA_NOMINALOW 3
@@ -16,7 +16,7 @@
 
 #define CZAS_OTWARCIA 8
 #define CZAS_ZAMKNIECIA 16
-#define GODZINA 1   // Reprezentacja jednej godziny w systemie (np. 1 sekunda = 1 godzina)
+#define GODZINA 20  // Reprezentacja jednej godziny w systemie (np. 1 sekunda = 1 godzina)
 
 // Struktura przechowująca liczbę banknotów w kasie
 typedef struct {

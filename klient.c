@@ -81,7 +81,6 @@ void proces_klienta() {
         //odbieranie wiadomosci od fryzjera ze strzyzenie sie zakonczylo
         msgrcv(kolejka, &wiad, sizeof(Wiadomosc) - sizeof(long), getpid(), 0);
 
-        operacja_semaforowa(semafor, 1, 1); //zwolnienie fotela
         operacja_semaforowa(semafor, 0, 1); //zwolnienie miejsca w poczekalni
 
         sleep(rand() % 30 + 1);

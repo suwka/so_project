@@ -1,6 +1,10 @@
 #ifndef FUNKCJE_H
 #define FUNKCJE_H
 
+
+#include <sys/types.h>
+#include <signal.h>
+
 #define FRYZJERZY 3
 #define KLIENCI 20
 #define POCZEKALNIA 10
@@ -11,9 +15,6 @@
 #define KOSZT_USLUGI 30
 #define KASA_STARTOWA_BANKNOTY {20, 20, 20}
 #define KLIENT_STARTOWE_BANKNOTY {5, 5, 5}
-
-#include <sys/types.h>
-#include <signal.h>
 
 typedef struct {
     int banknoty[LICZBA_NOMINALOW];
@@ -47,8 +48,6 @@ int zaplac(int *zrodlo, int kwota, int *cel);
 
 void wyczysc_kolejke(int kolejka);
 
-extern volatile sig_atomic_t ewakuacja; // Deklaracja zmiennej globalnej
-
-
+extern volatile sig_atomic_t ewakuacja;
 
 #endif

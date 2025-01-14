@@ -38,6 +38,13 @@ void proces_klienta() {
 
         sleep(rand() % 3 + 1);
 
+        int czy_ewakuacja = semctl(semafor, 4, GETVAL);
+        if (czy_ewakuacja == 0) {
+            //printf("Klient %d: Ewakuacja w toku, nie wchodzę.\n", getpid());
+            sleep(rand() % 5 + 1);
+            continue;
+        }
+
         printf("Klient %d przychodzi do salonu.\n", getpid());
         if (semop(semafor, (struct sembuf[]){{0, -1, IPC_NOWAIT}}, 1) == -1) {
             printf("Klient %d opuszcza salon, bo jest pełno.\n", getpid());
@@ -72,7 +79,7 @@ void proces_klienta() {
 
         msgrcv(kolejka, &wiad, sizeof(Wiadomosc) - sizeof(long), getpid(), 0);
 
-        printf("Klient %d wychodzi z salonu.\n", getpid());
+        //printf("Klient %d wychodzi z salonu.\n", getpid());
         operacja_semaforowa(semafor, 1, 1);
         operacja_semaforowa(semafor, 0, 1);
 

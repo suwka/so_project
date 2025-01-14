@@ -69,7 +69,7 @@ void zwolnij_zasoby() {
     msgctl(kolejka, IPC_RMID, NULL);
     shmdt(kasa);
     shmctl(pamiec_kasy, IPC_RMID, NULL);
-    printf("Zasoby zwolnione.\n");
+    //printf("Zasoby zwolnione.\n");
     exit(0);
 }
 

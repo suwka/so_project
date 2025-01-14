@@ -5,10 +5,11 @@
 #include <string.h>
 #include "funkcje.h"
 #include <sys/prctl.h>
+#include <time.h>
 
 
 void zakoncz_symulacje(int sig) {
-    printf("Zakończenie symulacji.\n");
+    //printf("Zakończenie symulacji.\n");
     zwolnij_zasoby();
     exit(0);
 }
@@ -18,6 +19,12 @@ int main(int argc, char *argv[]) {
     inicjalizuj_zasoby();
 
     pid_t pid_kierownika;
+
+    int czas_symulacji = (CZAS_ZAMKNIECIA - CZAS_OTWARCIA) * GODZINA;
+    printf("Symulacja czasu pracy salonu: %d godzin będzie trwać %d sekund.\n", 
+           CZAS_ZAMKNIECIA - CZAS_OTWARCIA, czas_symulacji);
+    sleep(3);
+    time_t start = time(NULL);
 
     // Uruchamiamy proces kierownika
     if ((pid_kierownika = fork()) == 0) {
@@ -44,10 +51,15 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    for (int i = 0; i < FRYZJERZY + KLIENCI + 1; i++) {
-        wait(NULL);
+    // Czekamy na zakończenie symulacji
+    while (difftime(time(NULL), start) < czas_symulacji) {
+        sleep(1); // Sprawdzanie co sekundę
     }
+
+    printf("Czas symulacji upłynął. Zakończono symulację z powodu zakończenia czasu pracy salonu.\n");
+    kill(0, SIGINT); // Wysyłamy sygnał zakończenia do wszystkich procesów
 
     zwolnij_zasoby();
     return 0;
 }
+

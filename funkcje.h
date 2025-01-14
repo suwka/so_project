@@ -16,6 +16,11 @@
 #define KASA_STARTOWA_BANKNOTY {20, 20, 20}
 #define KLIENT_STARTOWE_BANKNOTY {5, 5, 5}
 
+#define CZAS_OTWARCIA 8
+#define CZAS_ZAMKNIECIA 16
+#define GODZINA 1
+
+
 typedef struct {
     int banknoty[LICZBA_NOMINALOW];
 } Kasa;

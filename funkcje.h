@@ -6,17 +6,17 @@
 
 #define FRYZJERZY 5
 #define KLIENCI 20
-#define POCZEKALNIA 3
+#define POCZEKALNIA 10
 #define FOTELE 3
 
 #define LICZBA_NOMINALOW 3
 #define KOSZT_USLUGI 30
 #define KASA_STARTOWA_BANKNOTY {20, 20, 20}
-#define KLIENT_STARTOWE_BANKNOTY {5, 5, 5}
+#define KLIENT_STARTOWE_BANKNOTY {3, 3, 3}
 
 #define CZAS_OTWARCIA 8
 #define CZAS_ZAMKNIECIA 16
-#define GODZINA 20  // Reprezentacja jednej godziny w systemie (np. 1 sekunda = 1 godzina)
+#define GODZINA 10  // Reprezentacja jednej godziny w systemie (np. 1 sekunda = 1 godzina)
 
 // Struktura przechowująca liczbę banknotów w kasie
 typedef struct {
